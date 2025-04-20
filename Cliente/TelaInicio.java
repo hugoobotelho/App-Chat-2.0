@@ -1,12 +1,4 @@
 
-/* ***************************************************************
-* Autor............: Hugo Botelho Santana
-* Matricula........: 202210485
-* Inicio...........: 21/11/2024
-* Ultima alteracao.: 28/11/2024
-* Nome.............: Camada de Transporte/Aplicação - Aplicativo de Instant Messaging
-* Funcao...........: Aplicativo de chat para troca de mensagens com o modelo cliente servidor
-*************************************************************** */
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -59,8 +51,8 @@ public class TelaInicio {
 
             // Verifica se o IP do servidor tem formato válido (exemplo básico de IP)
             // if (!isIPValido(ipServidor)) {
-            //     mostrarMensagemErro("IP do servidor inválido.");
-            //     return;
+            // mostrarMensagemErro("IP do servidor inválido.");
+            // return;
             // }
 
             // Define os dados para a aplicação
@@ -93,23 +85,25 @@ public class TelaInicio {
         Platform.runLater(() -> layout.requestFocus());
     }
 
-    /**
-     * Valida o formato básico de um IP (ex: 192.168.0.1).
-     * 
-     * @param ip O IP a ser validado.
-     * @return true se o IP for válido, falso caso contrário.
-     */
-    private boolean isIPValido(String ip) {
-        // Exemplo simples de verificação de formato de IP
-        String regex = "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
-        return ip.matches(regex);
-    }
+    // /**
+    // * Valida o formato básico de um IP (ex: 192.168.0.1).
+    // *
+    // * @param ip O IP a ser validado.
+    // * @return true se o IP for válido, falso caso contrário.
+    // */
+    // private boolean isIPValido(String ip) {
+    // // Exemplo simples de verificação de formato de IP
+    // String regex =
+    // "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+    // return ip.matches(regex);
+    // }
 
-    /**
-     * Exibe uma mensagem de erro ao usuário.
-     * 
-     * @param mensagem A mensagem de erro a ser exibida.
-     */
+    /* ***************************************************************
+    * Metodo: mostrarMensagemErro
+    * Funcao: Exibe uma mensagem de erro ao usuário por um tempo limitado (3 segundos).
+    * Parametros: String mensagem - a mensagem de erro a ser exibida
+    * Retorno: void
+    *************************************************************** */
     private void mostrarMensagemErro(String mensagem) {
         Label mensagemErro = new Label(mensagem);
         mensagemErro.setStyle("-fx-text-fill: red; -fx-font-size: 14px; -fx-font-weight: bold;");
@@ -128,12 +122,12 @@ public class TelaInicio {
         });
     }
 
-    /**
-     * Cria um TextField com placeholder persistente (não some ao focar).
-     *
-     * @param placeholder Texto do placeholder.
-     * @return TextField configurado.
-     */
+    /* ***************************************************************
+    * Metodo: criarCampoComPlaceholder
+    * Funcao: Cria um campo de texto (TextField) com placeholder persistente, que não desaparece ao focar.
+    * Parametros: String placeholder - o texto que será exibido como placeholder
+    * Retorno: TextField - o campo de texto configurado
+    *************************************************************** */
     private TextField criarCampoComPlaceholder(String placeholder) {
         TextField campo = new TextField();
         campo.setPromptText(placeholder);
@@ -151,7 +145,12 @@ public class TelaInicio {
 
         return campo;
     }
-
+  /* ***************************************************************
+    * Metodo: getLayout
+    * Funcao: Retorna o layout principal da tela de início.
+    * Parametros: nenhum
+    * Retorno: VBox - o layout principal da tela de início
+    *************************************************************** */
     public VBox getLayout() {
         return layout;
     }

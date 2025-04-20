@@ -1,12 +1,4 @@
 
-/* ***************************************************************
-* Autor............: Hugo Botelho Santana
-* Matricula........: 202210485
-* Inicio...........: 21/11/2024
-* Ultima alteracao.: 28/11/2024
-* Nome.............: Camada de Transporte/Aplicação - Aplicativo de Instant Messaging
-* Funcao...........: Aplicativo de chat para troca de mensagens com o modelo cliente servidor
-*************************************************************** */
 import java.net.*;
 import java.util.Map;
 
@@ -19,6 +11,14 @@ public class ServidorUDP {
     this.usuarios = usuarios;
   }
 
+  /*
+   * ***************************************************************
+   * Metodo: iniciar
+   * Funcao: Inicia o servidor UDP na porta 6789 e aguarda mensagens dos clientes.
+   * A cada mensagem recebida, cria uma nova thread para processá-la.
+   * Parametros: nenhum
+   * Retorno: void
+   */
   public void iniciar() {
     try {
       DatagramSocket servidorSocket = new DatagramSocket(6789); // Porta do servidor
@@ -40,7 +40,7 @@ public class ServidorUDP {
     }
   }
 
-  private class ProcessaMensagem implements Runnable {
+  private class ProcessaMensagem extends Thread {
     private final DatagramPacket pacoteRecebido;
     private final DatagramSocket servidorSocket;
 
@@ -49,6 +49,15 @@ public class ServidorUDP {
       this.servidorSocket = servidorSocket;
     }
 
+    /*
+     * ***************************************************************
+     * Metodo: run
+     * Funcao: Executa o processamento da mensagem recebida no formato:
+     * "SEND|Grupo|Usuario|Mensagem", e reencaminha a mensagem
+     * para os demais membros do grupo, exceto o remetente.
+     * Parametros: nenhum
+     * Retorno: void
+     */
     @Override
     public void run() {
       try {

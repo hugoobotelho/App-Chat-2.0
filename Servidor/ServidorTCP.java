@@ -1,12 +1,4 @@
 
-/* ***************************************************************
-* Autor............: Hugo Botelho Santana
-* Matricula........: 202210485
-* Inicio...........: 21/11/2024
-* Ultima alteracao.: 28/11/2024
-* Nome.............: Camada de Transporte/Aplicação - Aplicativo de Instant Messaging
-* Funcao...........: Aplicativo de chat para troca de mensagens com o modelo cliente servidor
-*************************************************************** */
 import java.net.*;
 import java.io.*;
 import java.util.Map;
@@ -21,6 +13,13 @@ public class ServidorTCP {
     this.usuarios = usuarios;
   }
 
+  /* ***************************************************************
+  * Metodo: iniciar
+  * Funcao: Inicia o servidor TCP na porta 6789, aguardando conexões.
+  *         Cada conexão é tratada por uma nova thread.
+  * Parametros: nenhum
+  * Retorno: void
+  *************************************************************** */
   public void iniciar() {
     try {
       int portaLocal = 6789;
@@ -36,13 +35,19 @@ public class ServidorTCP {
     }
   }
 
-  private class ProcessaCliente implements Runnable {
+  private class ProcessaCliente extends Thread {
     private final Socket conexao;
 
     public ProcessaCliente(Socket conexao) {
       this.conexao = conexao;
     }
-
+    /* ***************************************************************
+    * Metodo: run
+    * Funcao: Lê a mensagem recebida, processa a operação (JOIN/LEAVE),
+    *         envia resposta ao cliente e fecha a conexão.
+    * Parametros: nenhum
+    * Retorno: void
+    *************************************************************** */
     @Override
     public void run() {
       ObjectInputStream entrada = null;
@@ -74,7 +79,14 @@ public class ServidorTCP {
         }
       }
     }
-
+    /* ***************************************************************
+    * Metodo: processarMensagem
+    * Funcao: Interpreta e executa o comando recebido (JOIN ou LEAVE).
+    * Parametros:
+    *    String mensagem - mensagem no formato TIPO|USUARIO|GRUPO
+    *    Socket conexao - conexão com o cliente, usada para obter IP e porta
+    * Retorno: String - resposta de sucesso ou erro da operação
+    *************************************************************** */
     private String processarMensagem(String mensagem, Socket conexao) {
       String[] partes = mensagem.split("\\|");
       if (partes.length < 3) {
