@@ -7,19 +7,22 @@ public class ServidorTCP {
 
   private final GrupoManager grupoManager;
   private final Map<String, Usuario> usuarios;
+  private Principal app;
 
-  public ServidorTCP(GrupoManager grupoManager, Map<String, Usuario> usuarios) {
+  public ServidorTCP(GrupoManager grupoManager, Map<String, Usuario> usuarios, Principal app) {
     this.grupoManager = grupoManager;
     this.usuarios = usuarios;
+    this.app = app;
   }
 
-  /* ***************************************************************
-  * Metodo: iniciar
-  * Funcao: Inicia o servidor TCP na porta 6789, aguardando conexões.
-  *         Cada conexão é tratada por uma nova thread.
-  * Parametros: nenhum
-  * Retorno: void
-  *************************************************************** */
+  /*
+   * ***************************************************************
+   * Metodo: iniciar
+   * Funcao: Inicia o servidor TCP na porta 6789, aguardando conexões.
+   * Cada conexão é tratada por uma nova thread.
+   * Parametros: nenhum
+   * Retorno: void
+   */
   public void iniciar() {
     try {
       int portaLocal = 6789;
@@ -41,13 +44,15 @@ public class ServidorTCP {
     public ProcessaCliente(Socket conexao) {
       this.conexao = conexao;
     }
-    /* ***************************************************************
-    * Metodo: run
-    * Funcao: Lê a mensagem recebida, processa a operação (JOIN/LEAVE),
-    *         envia resposta ao cliente e fecha a conexão.
-    * Parametros: nenhum
-    * Retorno: void
-    *************************************************************** */
+
+    /*
+     * ***************************************************************
+     * Metodo: run
+     * Funcao: Lê a mensagem recebida, processa a operação (JOIN/LEAVE),
+     * envia resposta ao cliente e fecha a conexão.
+     * Parametros: nenhum
+     * Retorno: void
+     */
     @Override
     public void run() {
       ObjectInputStream entrada = null;
@@ -79,14 +84,16 @@ public class ServidorTCP {
         }
       }
     }
-    /* ***************************************************************
-    * Metodo: processarMensagem
-    * Funcao: Interpreta e executa o comando recebido (JOIN ou LEAVE).
-    * Parametros:
-    *    String mensagem - mensagem no formato TIPO|USUARIO|GRUPO
-    *    Socket conexao - conexão com o cliente, usada para obter IP e porta
-    * Retorno: String - resposta de sucesso ou erro da operação
-    *************************************************************** */
+
+    /*
+     * ***************************************************************
+     * Metodo: processarMensagem
+     * Funcao: Interpreta e executa o comando recebido (JOIN ou LEAVE).
+     * Parametros:
+     * String mensagem - mensagem no formato TIPO|USUARIO|GRUPO
+     * Socket conexao - conexão com o cliente, usada para obter IP e porta
+     * Retorno: String - resposta de sucesso ou erro da operação
+     */
     private String processarMensagem(String mensagem, Socket conexao) {
       String[] partes = mensagem.split("\\|");
       if (partes.length < 3) {
@@ -104,15 +111,33 @@ public class ServidorTCP {
       }
 
       synchronized (grupoManager) {
+        String newMessage;
         switch (tipo.toUpperCase()) {
           case "JOIN":
-            grupoManager.adicionarUsuario(nomeGrupo, usuario);
+            app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
+            grupoManager.adicionarUsuario(nomeGrupo, usuario, false);
             return "Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
 
           case "LEAVE":
+            app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
             if (grupoManager.grupoExiste(nomeGrupo)) {
-              grupoManager.removerUsuario(nomeGrupo, usuario);
+              grupoManager.removerUsuario(nomeGrupo, usuario, false);
               return "Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
+            } else {
+              return "Erro: Grupo " + nomeGrupo + " não existe.";
+            }
+          case "ATUALIZAR_JOIN":
+            newMessage = "JOIN|" + nomeUsuario + "|" + nomeGrupo;
+            app.setMessageLog(newMessage);
+            grupoManager.adicionarUsuario(nomeGrupo, usuario, true);
+            return "Fui atualizado com Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
+
+          case "ATUALIZAR_LEAVE":
+            newMessage = "LEAVE|" + nomeUsuario + "|" + nomeGrupo;
+            app.setMessageLog(newMessage);
+            if (grupoManager.grupoExiste(nomeGrupo)) {
+              grupoManager.removerUsuario(nomeGrupo, usuario, true);
+              return "Fui atualizado com Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
             } else {
               return "Erro: Grupo " + nomeGrupo + " não existe.";
             }

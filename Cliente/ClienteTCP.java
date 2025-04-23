@@ -2,6 +2,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -58,56 +59,96 @@ public class ClienteTCP {
 
   }
 
-  /* ***************************************************************
-  * Metodo: enviarAPDUJoin
-  * Funcao: Inicia uma thread para envio da APDU JOIN ao servidor.
-  * Parametros: String nomeUsuario - nome do usuário  
-  *             String nomeGrupo - nome do grupo a ser ingressado
-  * Retorno: void
-  *************************************************************** */
+  /*
+   * ***************************************************************
+   * Metodo: enviarAPDUJoin
+   * Funcao: Inicia uma thread para envio da APDU JOIN ao servidor.
+   * Parametros: String nomeUsuario - nome do usuário
+   * String nomeGrupo - nome do grupo a ser ingressado
+   * Retorno: void
+   */
   public void enviarAPDUJoin(String nomeUsuario, String nomeGrupo) {
     Thread threadJoin = new Thread(() -> conectarESalvarAPDU("JOIN", nomeUsuario, nomeGrupo));
     threadJoin.start(); // Inicia a thread de envio JOIN
   }
 
-  /* ***************************************************************
-  * Metodo: enviarAPDULeave
-  * Funcao: Inicia uma thread para envio da APDU LEAVE ao servidor.
-  * Parametros: String nomeUsuario - nome do usuário  
-  *             String nomeGrupo - nome do grupo a ser deixado
-  * Retorno: void
-  *************************************************************** */
+  /*
+   * ***************************************************************
+   * Metodo: enviarAPDULeave
+   * Funcao: Inicia uma thread para envio da APDU LEAVE ao servidor.
+   * Parametros: String nomeUsuario - nome do usuário
+   * String nomeGrupo - nome do grupo a ser deixado
+   * Retorno: void
+   */
   public void enviarAPDULeave(String nomeUsuario, String nomeGrupo) {
     Thread threadLeave = new Thread(() -> conectarESalvarAPDU("LEAVE", nomeUsuario, nomeGrupo));
     threadLeave.start(); // Inicia a thread de envio LEAVE
   }
 
-  /* ***************************************************************
-  * Metodo: escolherNovoServidor
-  * Funcao: Seleciona um novo servidor da lista de conhecidos e tenta reconexão com a mesma APDU.
-  * Parametros: String tipoMensagem - tipo da requisição (JOIN ou LEAVE)  
-  *             String nomeUsuario - nome do usuário  
-  *             String nomeGrupo - nome do grupo
-  * Retorno: void
-  *************************************************************** */
+  /*
+   * ***************************************************************
+   * Metodo: escolherNovoServidor
+   * Funcao: Seleciona um novo servidor da lista de conhecidos e tenta reconexão
+   * com a mesma APDU.
+   * Parametros: String tipoMensagem - tipo da requisição (JOIN ou LEAVE)
+   * String nomeUsuario - nome do usuário
+   * String nomeGrupo - nome do grupo
+   * Retorno: void
+   */
+  // private void escolherNovoServidor(String tipoMensagem, String nomeUsuario, String nomeGrupo) {
+  //   List<String> listaServidores = new ArrayList<String>(app.getServidoresConhecidos());
+
+  //   // if (listaServidores.isEmpty())
+  //   // return;
+
+  //   int total = listaServidores.size();
+  //   indiceAtual++;
+  //   if (indiceAtual >= total) {
+  //     indiceAtual = 0;
+  //   }
+
+  //   // Pega apenas o próximo da lista
+  //   // int proximoIndice = (indiceAtual + 1) % total;
+  //   String ip = listaServidores.get(indiceAtual);
+  //   host = ip;
+
+  //   System.out.println("Tentando próximo servidor: " + ip);
+  //   conectarESalvarAPDU(tipoMensagem, nomeUsuario, nomeGrupo);
+  // }
+
   private void escolherNovoServidor(String tipoMensagem, String nomeUsuario, String nomeGrupo) {
-    List<String> listaServidores = new ArrayList<String>(app.getServidoresConhecidos());
+    List<String> servidoresConhecidos = new ArrayList<>(app.getServidoresConhecidos());
 
-    // if (listaServidores.isEmpty())
-    // return;
-
-    int total = listaServidores.size();
-    indiceAtual++;
-    if (indiceAtual >= total) {
-      indiceAtual = 0;
+    if (servidoresConhecidos.isEmpty()) {
+      System.out.println("Nenhum servidor conhecido para tentar.");
+      return;
     }
 
-    // Pega apenas o próximo da lista
-    // int proximoIndice = (indiceAtual + 1) % total;
-    String ip = listaServidores.get(indiceAtual);
-    host = ip;
+    // Ordena IPs em ordem crescente (alvo: consistência entre os clientes)
+    Collections.sort(servidoresConhecidos);
 
-    System.out.println("Tentando próximo servidor: " + ip);
+    // Avança para o próximo da lista ordenada
+
+    int indice = servidoresConhecidos.indexOf(host);
+    if (indice == -1) {
+      indice = 0; // ou talvez definir explicitamente como líder o primeiro da lista
+    } else {
+      indice++;
+      if (indice >= servidoresConhecidos.size()) {
+        indice = 0;
+      }
+    }
+    
+    // indiceAtual++;
+    // if (indiceAtual >= servidoresConhecidos.size()) {
+    //   indiceAtual = 0;
+    // }
+
+    String ipEscolhido = servidoresConhecidos.get(indice);
+    host = ipEscolhido;
+
+    System.out.println("Tentando próximo servidor (ordem ordenada): " + ipEscolhido);
     conectarESalvarAPDU(tipoMensagem, nomeUsuario, nomeGrupo);
   }
+
 }
