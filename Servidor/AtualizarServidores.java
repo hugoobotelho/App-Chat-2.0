@@ -34,11 +34,12 @@ public class AtualizarServidores {
           String tipo = partes[0].trim();
           String nomeUsuario = partes[1].trim();
           String nomeGrupo = partes[2].trim();
-          if (partes.length != 3) {
+          String timeStamp = partes[3].trim();
+          if (partes.length != 4) {
             System.err.println("Mensagem mal formatada: " + mensagem);
             continue;
           }
-          conectarESalvarAPDU(tipo, nomeUsuario, nomeGrupo);
+          conectarESalvarAPDU(tipo, nomeUsuario, nomeGrupo, timeStamp);
         } catch (InterruptedException e) {
           System.out.println("Thread de envio interrompida.");
           break; // encerra a thread se for interrompida
@@ -59,14 +60,14 @@ public class AtualizarServidores {
    * String nomeGrupo - nome do grupo
    * Retorno: void
    */
-  private void conectarESalvarAPDU(String tipoMensagem, String nomeUsuario, String nomeGrupo) {
+  private void conectarESalvarAPDU(String tipoMensagem, String nomeUsuario, String nomeGrupo, String timeStamp) {
     try (Socket socket = new Socket(host, porta)) {
       System.out.println("Conectado ao servidor " + host + ":" + porta);
       // app.setIpServidor(host); //atualiza o servidor ativo
 
       // Envia a mensagem
       ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream());
-      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo;
+      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo + "|" + timeStamp;
       saida.writeObject(mensagem);
       saida.flush();
       System.out.println("Mensagem enviada: " + mensagem);
@@ -85,7 +86,7 @@ public class AtualizarServidores {
       }
       // escolherNovoServidor(tipoMensagem, nomeUsuario, nomeGrupo); // Se falhar,
       // tenta outro
-      conectarESalvarAPDU(tipoMensagem, nomeUsuario, nomeGrupo); // tenta novamente depois de 1s
+      conectarESalvarAPDU(tipoMensagem, nomeUsuario, nomeGrupo, timeStamp); // tenta novamente depois de 1s
     }
 
   }
@@ -100,11 +101,11 @@ public class AtualizarServidores {
    * String nomeGrupo - nome do grupo que o usuário deseja entrar
    * Retorno: void
    */
-  public void enviarAPDUJoin(String nomeUsuario, String nomeGrupo) {
+  public void enviarAPDUJoin(String nomeUsuario, String nomeGrupo, String timeStamp) {
     // Thread threadJoin = new Thread(() -> conectarESalvarAPDU("ATUALIZAR_JOIN",
     // nomeUsuario, nomeGrupo));
     // threadJoin.start(); // Inicia a thread de envio JOIN
-    String mensagem = "ATUALIZAR_JOIN|" + nomeUsuario + "|" + nomeGrupo;
+    String mensagem = "ATUALIZAR_JOIN|" + nomeUsuario + "|" + nomeGrupo + "|" + timeStamp;
     filaMensagens.add(mensagem);
   }
 
@@ -118,11 +119,11 @@ public class AtualizarServidores {
    * String nomeGrupo - nome do grupo que o usuário deseja sair
    * Retorno: void
    */
-  public void enviarAPDULeave(String nomeUsuario, String nomeGrupo) {
+  public void enviarAPDULeave(String nomeUsuario, String nomeGrupo, String timeStamp) {
     // Thread threadLeave = new Thread(() -> conectarESalvarAPDU("ATUALIZAR_LEAVE",
     // nomeUsuario, nomeGrupo));
     // threadLeave.start(); // Inicia a thread de envio LEAVE
-    String mensagem = "ATUALIZAR_LEAVE|" + nomeUsuario + "|" + nomeGrupo;
+    String mensagem = "ATUALIZAR_LEAVE|" + nomeUsuario + "|" + nomeGrupo + "|" + timeStamp;
     filaMensagens.add(mensagem);
 
   }

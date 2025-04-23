@@ -2,7 +2,7 @@
 * Autor............: Hugo Botelho Santana
 * Matricula........: 202210485
 * Inicio...........: 19/04/2025
-* Ultima alteracao.: 20/04/2025
+* Ultima alteracao.: 23/04/2025
 * Nome.............: Programa de Chat/WhatZap com múltiplos servidores (conexões UDP e TCP)
 * Funcao...........: Aplicativo de chat para troca de mensagens com o modelo n clientes e n servidores
 *************************************************************** */
@@ -17,7 +17,7 @@ import java.util.Set;
 public class Principal {
 
   private static final Map<String, Usuario> usuarios = new HashMap<>(); // Gerencia usuários
-  private Set<String> servidoresConhecidos;
+  private static Set<String> servidoresConhecidos;
   private static DescobrirServidores descobrirServidores;
   private static Principal app;
   private static GrupoManager grupoManager; // Gerencia grupos
@@ -27,6 +27,8 @@ public class Principal {
   public static void main(String[] args) {
 
     app = new Principal();
+
+    servidoresConhecidos = new HashSet<>();
 
     descobrirServidores = new DescobrirServidores(app);
     descobrirServidores.iniciarDescobrimento();
@@ -107,11 +109,16 @@ public class Principal {
         String tipo = partes[0].trim();
         String nomeUsuario = partes[1].trim();
         String nomeGrupo = partes[2].trim();
+        String timeStamp = partes[3].trim();
+        if (partes.length != 4) {
+          System.err.println("Mensagem mal formatada: " + message);
+          return;
+        }
         if (tipo.equals("JOIN")) {
-          atualizarServidores.enviarAPDUJoin(nomeUsuario, nomeGrupo);
+          atualizarServidores.enviarAPDUJoin(nomeUsuario, nomeGrupo, timeStamp);
         }
         else if (tipo.equals("LEAVE")){
-          atualizarServidores.enviarAPDULeave(nomeUsuario, nomeGrupo);
+          atualizarServidores.enviarAPDULeave(nomeUsuario, nomeGrupo, timeStamp);
         }
       }
     }
@@ -128,7 +135,9 @@ public class Principal {
   }
 
   public void setMessageLog(String message) {
-    menssagensLog.add(message);
+    if (!menssagensLog.contains(message)){
+      menssagensLog.add(message);
+    }
   }
 
   public List<String> getMessageLog() {

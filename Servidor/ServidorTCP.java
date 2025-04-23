@@ -111,15 +111,22 @@ public class ServidorTCP {
       }
 
       synchronized (grupoManager) {
-        String newMessage;
+        // String newMessage; 
+        String mensagemComTimestamp;
         switch (tipo.toUpperCase()) {
           case "JOIN":
-            app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
+            mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
+            app.setMessageLog(mensagemComTimestamp);
+
+            // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
             grupoManager.adicionarUsuario(nomeGrupo, usuario, false);
             return "Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
 
           case "LEAVE":
-            app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
+            mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
+            app.setMessageLog(mensagemComTimestamp);
+
+            // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
             if (grupoManager.grupoExiste(nomeGrupo)) {
               grupoManager.removerUsuario(nomeGrupo, usuario, false);
               return "Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
@@ -127,14 +134,14 @@ public class ServidorTCP {
               return "Erro: Grupo " + nomeGrupo + " não existe.";
             }
           case "ATUALIZAR_JOIN":
-            newMessage = "JOIN|" + nomeUsuario + "|" + nomeGrupo;
-            app.setMessageLog(newMessage);
+            // newMessage = "JOIN|" + nomeUsuario + "|" + nomeGrupo;
+            app.setMessageLog(mensagem);
             grupoManager.adicionarUsuario(nomeGrupo, usuario, true);
             return "Fui atualizado com Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
 
           case "ATUALIZAR_LEAVE":
-            newMessage = "LEAVE|" + nomeUsuario + "|" + nomeGrupo;
-            app.setMessageLog(newMessage);
+            // newMessage = "LEAVE|" + nomeUsuario + "|" + nomeGrupo;
+            app.setMessageLog(mensagem);
             if (grupoManager.grupoExiste(nomeGrupo)) {
               grupoManager.removerUsuario(nomeGrupo, usuario, true);
               return "Fui atualizado com Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;

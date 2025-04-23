@@ -29,7 +29,19 @@ public class GrupoManager {
       if (servidores != null) {
         List<AtualizarServidores> servidoresTCP = new ArrayList<>(servidores);
         for (AtualizarServidores servidor : servidoresTCP) {
-          servidor.enviarAPDUJoin(nomeGrupo, nomeGrupo);
+          for (String message : app.getMessageLog()) {
+            String[] partes = message.split("\\|");
+            String tipo = partes[0].trim();
+            String nomeUsuario = partes[1].trim();
+            String nomeDoGrupo = partes[2].trim();
+            String timeStamp = partes[3].trim();
+            if (tipo.equals("JOIN")) {
+              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, timeStamp);
+            } else if (tipo.equals("LEAVE")) {
+              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, timeStamp);
+            }
+          }
+          // servidor.enviarAPDUJoin(nomeGrupo, nomeGrupo);
         }
       }
     }
@@ -62,11 +74,23 @@ public class GrupoManager {
       if (servidores != null) {
         List<AtualizarServidores> servidoresTCP = new ArrayList<>(servidores);
         for (AtualizarServidores servidor : servidoresTCP) {
-          servidor.enviarAPDULeave(nomeGrupo, nomeGrupo);
+          for (String message : app.getMessageLog()) {
+            String[] partes = message.split("\\|");
+            String tipo = partes[0].trim();
+            String nomeUsuario = partes[1].trim();
+            String nomeDoGrupo = partes[2].trim();
+            String timeStamp = partes[3].trim();
+            if (tipo.equals("JOIN")) {
+              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, timeStamp);
+            } else if (tipo.equals("LEAVE")) {
+              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, timeStamp);
+            }
+          }
         }
+        // servidor.enviarAPDULeave(nomeGrupo, nomeGrupo);
       }
     }
-
+    
     imprimirGrupos();
 
   }
