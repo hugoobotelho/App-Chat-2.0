@@ -95,63 +95,70 @@ public class ServidorTCP {
      * Retorno: String - resposta de sucesso ou erro da operação
      */
     private String processarMensagem(String mensagem, Socket conexao) {
-      String[] partes = mensagem.split("\\|");
-      if (partes.length < 3) {
-        return "Erro: Mensagem mal formatada. Esperado TIPO|USUARIO|GRUPO.";
-      }
-
-      String tipo = partes[0].trim();
-      String nomeUsuario = partes[1].trim();
-      String nomeGrupo = partes[2].trim();
-
-      Usuario usuario;
-      synchronized (usuarios) {
-        usuario = usuarios.computeIfAbsent(nomeUsuario,
-            k -> new Usuario(nomeUsuario, conexao.getInetAddress(), conexao.getPort()));
-      }
-
-      synchronized (grupoManager) {
-        // String newMessage; 
-        String mensagemComTimestamp;
-        switch (tipo.toUpperCase()) {
-          case "JOIN":
-            mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
-            app.setMessageLog(mensagemComTimestamp);
-
-            // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
-            grupoManager.adicionarUsuario(nomeGrupo, usuario, false);
-            return "Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
-
-          case "LEAVE":
-            mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
-            app.setMessageLog(mensagemComTimestamp);
-
-            // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
-            if (grupoManager.grupoExiste(nomeGrupo)) {
-              grupoManager.removerUsuario(nomeGrupo, usuario, false);
-              return "Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
-            } else {
-              return "Erro: Grupo " + nomeGrupo + " não existe.";
-            }
-          case "ATUALIZAR_JOIN":
-            // newMessage = "JOIN|" + nomeUsuario + "|" + nomeGrupo;
-            app.setMessageLog(mensagem);
-            grupoManager.adicionarUsuario(nomeGrupo, usuario, true);
-            return "Fui atualizado com Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
-
-          case "ATUALIZAR_LEAVE":
-            // newMessage = "LEAVE|" + nomeUsuario + "|" + nomeGrupo;
-            app.setMessageLog(mensagem);
-            if (grupoManager.grupoExiste(nomeGrupo)) {
-              grupoManager.removerUsuario(nomeGrupo, usuario, true);
-              return "Fui atualizado com Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
-            } else {
-              return "Erro: Grupo " + nomeGrupo + " não existe.";
-            }
-
-          default:
-            return "Erro: Tipo de mensagem desconhecido. Use JOIN ou LEAVE.";
+      try {
+        String[] partes = mensagem.split("\\|");
+        if (partes.length < 3) {
+          return "Erro: Mensagem mal formatada. Esperado TIPO|USUARIO|GRUPO.";
         }
+
+        String tipo = partes[0].trim();
+        String nomeUsuario = partes[1].trim();
+        String nomeGrupo = partes[2].trim();
+        InetAddress enderecoUsuario;
+        enderecoUsuario = InetAddress.getByName(partes[3].trim());
+        Usuario usuario;
+        synchronized (usuarios) {
+          usuario = usuarios.computeIfAbsent(nomeUsuario,
+              k -> new Usuario(nomeUsuario, enderecoUsuario, conexao.getPort()));
+        }
+
+        synchronized (grupoManager) {
+          // String newMessage;
+          String mensagemComTimestamp;
+          switch (tipo.toUpperCase()) {
+            case "JOIN":
+              mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
+              app.setMessageLog(mensagemComTimestamp);
+
+              // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
+              grupoManager.adicionarUsuario(nomeGrupo, usuario, false);
+              return "Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
+
+            case "LEAVE":
+              mensagemComTimestamp = mensagem + "|" + System.currentTimeMillis();
+              app.setMessageLog(mensagemComTimestamp);
+
+              // app.setMessageLog(mensagem); // adiciona a mensagem ao log de mensagens
+              if (grupoManager.grupoExiste(nomeGrupo)) {
+                grupoManager.removerUsuario(nomeGrupo, usuario, false);
+                return "Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
+              } else {
+                return "Erro: Grupo " + nomeGrupo + " não existe.";
+              }
+            case "ATUALIZAR_JOIN":
+              // newMessage = "JOIN|" + nomeUsuario + "|" + nomeGrupo;
+              app.setMessageLog(mensagem);
+              grupoManager.adicionarUsuario(nomeGrupo, usuario, true);
+              return "Fui atualizado com Usuário " + nomeUsuario + " adicionado ao grupo " + nomeGrupo;
+
+            case "ATUALIZAR_LEAVE":
+              // newMessage = "LEAVE|" + nomeUsuario + "|" + nomeGrupo;
+              app.setMessageLog(mensagem);
+              if (grupoManager.grupoExiste(nomeGrupo)) {
+                grupoManager.removerUsuario(nomeGrupo, usuario, true);
+                return "Fui atualizado com Usuário " + nomeUsuario + " removido do grupo " + nomeGrupo;
+              } else {
+                return "Erro: Grupo " + nomeGrupo + " não existe.";
+              }
+
+            default:
+              return "Erro: Tipo de mensagem desconhecido. Use JOIN ou LEAVE.";
+          }
+        }
+      } catch (UnknownHostException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+        return "Erro: possivel mensagem mal formatada";
       }
     }
   }

@@ -4,12 +4,6 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-import javafx.geometry.HorizontalDirection;
 
 public class DescobrirServidores {
   private final static int porta = 2025;
