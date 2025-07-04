@@ -4,14 +4,16 @@ import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketTimeoutException;
+import java.util.TreeSet;
 
 public class DescobrirServidores {
   private final static int porta = 2025;
   private static final String broadCast = obterBroadcast();
-  private static final int timeOutMs = 2000;
-  private static final int intervaloDeSincronizacao = 5000; // Tempo entre sincronizações (5s)
+  private static final int timeOutMs = 250;
+  private static final int intervaloDeSincronizacao = 250; // Tempo entre sincronizações (5s)
   private Principal app;
   private InetAddress ipLocal;
+  private final java.util.Map<String, Integer> contagemFalhas = new java.util.HashMap<>();
 
   DescobrirServidores(Principal app) {
     this.app = app;
@@ -54,24 +56,27 @@ public class DescobrirServidores {
         byte[] mensagem = "AREYOUALIVE".getBytes();
         DatagramPacket pacote = new DatagramPacket(mensagem, mensagem.length, InetAddress.getByName(broadCast), porta);
         socket.send(pacote);
-        System.out.println("APDU AREYOUALIVE enviada via broadcast");
+        // System.out.println("APDU AREYOUALIVE enviada via broadcast");
 
         // espera respostas
         long inicio = System.currentTimeMillis();
-
+        TreeSet<String> servidoresQueResponderam = new TreeSet<>();
         while (System.currentTimeMillis() - inicio < timeOutMs) {
           byte[] buffer = new byte[1024];
           DatagramPacket resposta = new DatagramPacket(buffer, buffer.length);
           try {
             socket.setSoTimeout(timeOutMs);
             socket.receive(resposta);
+            InetAddress ipResposta = resposta.getAddress();
+            servidoresQueResponderam.add(ipResposta.getHostAddress());
 
             if (!resposta.getAddress().equals(ipLocal)) { // ignora se foi ele mesmo que se respondeu
               String msg = new String(resposta.getData(), 0, resposta.getLength());
 
               if (msg.equals("IMALIVE")) {
-                app.setServidoresConhecidos(resposta.getAddress().getHostAddress()); //adiciona o ip do servidor descoberto
-                System.out.println("Resposta recebida de " + resposta.getAddress());
+                app.setServidoresConhecidos(resposta.getAddress().getHostAddress()); // adiciona o ip do servidor
+                                                                                     // descoberto
+                // System.out.println("Resposta recebida de " + resposta.getAddress());
               }
             }
 
@@ -81,6 +86,26 @@ public class DescobrirServidores {
         }
 
         Thread.sleep(intervaloDeSincronizacao);
+
+        // Marca quem respondeu com 0 falhas
+        for (String ip : servidoresQueResponderam) {
+          contagemFalhas.put(ip, 0); // reset
+        }
+
+        // Verifica quem NÃO respondeu
+        for (String ipServidorConhecido : new java.util.HashSet<>(app.getServidoresConhecidos())) {
+          if (!servidoresQueResponderam.contains(ipServidorConhecido)) {
+            int falhas = contagemFalhas.getOrDefault(ipServidorConhecido, 0) + 1;
+            contagemFalhas.put(ipServidorConhecido, falhas);
+
+            if (falhas >= 3) {
+              System.out.println("Servidor " + ipServidorConhecido + " removido após 3 falhas. Servidor caiu!");
+              app.getServidoresConhecidos().remove(ipServidorConhecido);
+              contagemFalhas.remove(ipServidorConhecido); // limpa o contador também
+            }
+          }
+        }
+
       }
 
     } catch (Exception e) {
@@ -109,16 +134,18 @@ public class DescobrirServidores {
         String mensagem = new String(pacoteRecebido.getData(), 0, pacoteRecebido.getLength());
 
         // if (mensagem.equals("SINC")) {
-        //   String horaAtual = app.getHorarioMaquina().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-        //   byte[] resposta = ("HORA|" + horaAtual).getBytes();
+        // String horaAtual =
+        // app.getHorarioMaquina().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+        // byte[] resposta = ("HORA|" + horaAtual).getBytes();
 
-        //   DatagramPacket pacoteResposta = new DatagramPacket(resposta, resposta.length, pacoteRecebido.getAddress(),
-        //       pacoteRecebido.getPort());
-        //   socket.send(pacoteResposta);
-        //   System.out.println("Respondi com meu horário: " + horaAtual);
+        // DatagramPacket pacoteResposta = new DatagramPacket(resposta, resposta.length,
+        // pacoteRecebido.getAddress(),
+        // pacoteRecebido.getPort());
+        // socket.send(pacoteResposta);
+        // System.out.println("Respondi com meu horário: " + horaAtual);
 
         // } else
-         if (mensagem.equals("AREYOUALIVE")) {
+        if (mensagem.equals("AREYOUALIVE")) {
           byte[] resposta = ("IMALIVE").getBytes();
 
           DatagramPacket pacoteResposta = new DatagramPacket(resposta, resposta.length, pacoteRecebido.getAddress(),
