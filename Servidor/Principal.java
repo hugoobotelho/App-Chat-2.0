@@ -129,9 +129,9 @@ public class Principal {
           System.err.println("Mensagem mal formatada: " + message);
           return;
         }
-        if (tipo.equals("JOIN")) {
+        if (tipo.equals("JOIN") || tipo.equals("ATUALIZAR_JOIN")) {
           atualizarServidores.enviarAPDUJoin(nomeUsuario, nomeGrupo, endereco, timeStamp);
-        } else if (tipo.equals("LEAVE")) {
+        } else if (tipo.equals("LEAVE") || tipo.equals("ATUALIZAR_JOIN")) {
           atualizarServidores.enviarAPDULeave(nomeUsuario, nomeGrupo, endereco, timeStamp);
         }
       }
