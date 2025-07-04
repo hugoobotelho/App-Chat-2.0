@@ -34,7 +34,7 @@ public class AtualizarServidores {
           String tipo = partes[0].trim();
           String nomeUsuario = partes[1].trim();
           String nomeGrupo = partes[2].trim();
-          String endereco = partes[2].trim();
+          String endereco = partes[3].trim();
           String timeStamp = partes[4].trim();
           if (partes.length != 4) {
             System.err.println("Mensagem mal formatada: " + mensagem);

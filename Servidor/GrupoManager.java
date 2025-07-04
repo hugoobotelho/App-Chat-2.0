@@ -34,7 +34,7 @@ public class GrupoManager {
             String tipo = partes[0].trim();
             String nomeUsuario = partes[1].trim();
             String nomeDoGrupo = partes[2].trim();
-            String endereco = partes[2].trim();
+            String endereco = partes[3].trim();
             String timeStamp = partes[4].trim();
             if (tipo.equals("JOIN")) {
               servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
@@ -80,7 +80,7 @@ public class GrupoManager {
             String tipo = partes[0].trim();
             String nomeUsuario = partes[1].trim();
             String nomeDoGrupo = partes[2].trim();
-            String endereco = partes[2].trim();
+            String endereco = partes[3].trim();
             String timeStamp = partes[4].trim();
             if (tipo.equals("JOIN")) {
               servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
