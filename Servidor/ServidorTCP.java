@@ -106,6 +106,11 @@ public class ServidorTCP {
         String nomeGrupo = partes[2].trim();
         String enderecoUsuario;
         enderecoUsuario = partes[3].trim();
+
+        if ( tipo.equals("JOIN") || tipo.equals("LEAVE")){
+          enderecoUsuario = conexao.getInetAddress().getHostAddress();
+          mensagem = tipo + "|" + nomeUsuario + "|" + nomeGrupo + "|" + enderecoUsuario;
+        }
         Usuario usuario;
         InetAddress ip = InetAddress.getByName(enderecoUsuario);
         synchronized (usuarios) {
