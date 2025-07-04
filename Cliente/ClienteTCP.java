@@ -37,7 +37,7 @@ public class ClienteTCP {
 
       // Envia a mensagem
       ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream());
-      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo;
+      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo + "|" + InetAddress.getLocalHost().getHostAddress();
       saida.writeObject(mensagem);
       saida.flush();
       System.out.println("Mensagem enviada: " + mensagem);

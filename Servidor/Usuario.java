@@ -38,9 +38,9 @@ public class Usuario {
   * Parametros: nenhum
   * Retorno: int - porta associada ao usuário
   *************************************************************** */
-  public int getPorta() {
-    return porta;
-  }
+  // public int getPorta() {
+  //   return porta;
+  // }
   /* ***************************************************************
   * Metodo: equals
   * Funcao: Verifica se dois objetos Usuario são iguais com base

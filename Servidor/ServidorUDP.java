@@ -99,7 +99,7 @@ public class ServidorUDP {
           for (Usuario usuario : grupoManager.obterMembros(nomeGrupo)) {
             if (!usuario.equals(remetente)) {
               InetAddress enderecoCliente = usuario.getEndereco();
-              int portaCliente = usuario.getPorta();
+              // int portaCliente = usuario.getPorta();
               byte[] dadosSaida = String.format("SEND|%s|%s|%s", nomeGrupo, nomeUsuario, conteudoMensagem).getBytes();
               DatagramPacket pacoteResposta = new DatagramPacket(dadosSaida, dadosSaida.length, enderecoCliente, 9876);
               servidorSocket.send(pacoteResposta);

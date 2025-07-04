@@ -109,16 +109,16 @@ public class Principal {
         String tipo = partes[0].trim();
         String nomeUsuario = partes[1].trim();
         String nomeGrupo = partes[2].trim();
-        String timeStamp = partes[3].trim();
+        String endereco = partes[2].trim();
+        String timeStamp = partes[4].trim();
         if (partes.length != 4) {
           System.err.println("Mensagem mal formatada: " + message);
           return;
         }
         if (tipo.equals("JOIN")) {
-          atualizarServidores.enviarAPDUJoin(nomeUsuario, nomeGrupo, timeStamp);
-        }
-        else if (tipo.equals("LEAVE")){
-          atualizarServidores.enviarAPDULeave(nomeUsuario, nomeGrupo, timeStamp);
+          atualizarServidores.enviarAPDUJoin(nomeUsuario, nomeGrupo, endereco, timeStamp);
+        } else if (tipo.equals("LEAVE")) {
+          atualizarServidores.enviarAPDULeave(nomeUsuario, nomeGrupo, endereco, timeStamp);
         }
       }
     }
@@ -135,7 +135,7 @@ public class Principal {
   }
 
   public void setMessageLog(String message) {
-    if (!menssagensLog.contains(message)){
+    if (!menssagensLog.contains(message)) {
       menssagensLog.add(message);
     }
   }

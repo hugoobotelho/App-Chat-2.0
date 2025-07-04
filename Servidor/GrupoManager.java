@@ -34,11 +34,12 @@ public class GrupoManager {
             String tipo = partes[0].trim();
             String nomeUsuario = partes[1].trim();
             String nomeDoGrupo = partes[2].trim();
-            String timeStamp = partes[3].trim();
+            String endereco = partes[2].trim();
+            String timeStamp = partes[4].trim();
             if (tipo.equals("JOIN")) {
-              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, timeStamp);
+              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
             } else if (tipo.equals("LEAVE")) {
-              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, timeStamp);
+              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
             }
           }
           // servidor.enviarAPDUJoin(nomeGrupo, nomeGrupo);
@@ -79,11 +80,12 @@ public class GrupoManager {
             String tipo = partes[0].trim();
             String nomeUsuario = partes[1].trim();
             String nomeDoGrupo = partes[2].trim();
-            String timeStamp = partes[3].trim();
+            String endereco = partes[2].trim();
+            String timeStamp = partes[4].trim();
             if (tipo.equals("JOIN")) {
-              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, timeStamp);
+              servidor.enviarAPDUJoin(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
             } else if (tipo.equals("LEAVE")) {
-              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, timeStamp);
+              servidor.enviarAPDULeave(nomeUsuario, nomeDoGrupo, endereco, timeStamp);
             }
           }
         }

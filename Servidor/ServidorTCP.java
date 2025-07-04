@@ -98,7 +98,7 @@ public class ServidorTCP {
       try {
         String[] partes = mensagem.split("\\|");
         if (partes.length < 3) {
-          return "Erro: Mensagem mal formatada. Esperado TIPO|USUARIO|GRUPO.";
+          return "Erro: Mensagem mal formatada. Esperado TIPO|USUARIO|GRUPO|ENDERECO.";
         }
 
         String tipo = partes[0].trim();
