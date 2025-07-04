@@ -104,12 +104,13 @@ public class ServidorTCP {
         String tipo = partes[0].trim();
         String nomeUsuario = partes[1].trim();
         String nomeGrupo = partes[2].trim();
-        InetAddress enderecoUsuario;
-        enderecoUsuario = InetAddress.getByName(partes[3].trim());
+        String enderecoUsuario;
+        enderecoUsuario = partes[3].trim();
         Usuario usuario;
+        InetAddress ip = InetAddress.getByName(enderecoUsuario);
         synchronized (usuarios) {
           usuario = usuarios.computeIfAbsent(nomeUsuario,
-              k -> new Usuario(nomeUsuario, enderecoUsuario, conexao.getPort()));
+              k -> new Usuario(nomeUsuario, ip, conexao.getPort()));
         }
 
         synchronized (grupoManager) {

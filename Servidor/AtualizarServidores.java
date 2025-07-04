@@ -69,7 +69,7 @@ public class AtualizarServidores {
 
       // Envia a mensagem
       ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream());
-      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo + "|" + timeStamp;
+      String mensagem = tipoMensagem + "|" + nomeUsuario + "|" + nomeGrupo + "|" + enderecoUsuario + "|" + timeStamp;
       saida.writeObject(mensagem);
       saida.flush();
       System.out.println("Mensagem enviada: " + mensagem);
