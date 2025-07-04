@@ -100,7 +100,7 @@ public class DescobrirServidores {
 
             if (falhas >= 3) {
               System.out.println("Servidor " + ipServidorConhecido + " removido após 3 falhas. Servidor caiu!");
-              app.getServidoresConhecidos().remove(ipServidorConhecido);
+              app.removerServidor(ipServidorConhecido);
               contagemFalhas.remove(ipServidorConhecido); // limpa o contador também
             }
           }

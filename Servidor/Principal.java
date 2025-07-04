@@ -88,6 +88,20 @@ public class Principal {
     return servidoresConhecidos;
   }
 
+  public void removerServidor(String ip) {
+    servidoresConhecidos.remove(ip);
+
+    servidoresTCP.removeIf(atualizador -> {
+      if (atualizador.getIpServidor().equals(ip)) {
+        atualizador.encerrar(); // encerra thread antes de remover
+        return true;
+      }
+      return false;
+    });
+
+    System.out.println("Servidor removido: " + ip);
+  }
+
   /*
    * ***************************************************************
    * Metodo: setServidoresConhecidos

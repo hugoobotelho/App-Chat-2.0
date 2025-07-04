@@ -15,6 +15,8 @@ public class AtualizarServidores {
   private Principal app;
   private BlockingQueue<String> filaMensagens;
   private Thread threadEnvio;
+  private volatile boolean executando = true;
+
 
   // Construtor
   public AtualizarServidores(String host, int porta, Principal app) {
@@ -27,7 +29,7 @@ public class AtualizarServidores {
 
   private void iniciarThreadDeEnvio() {
     threadEnvio = new Thread(() -> {
-      while (true) {
+      while (executando) {
         try {
           String mensagem = filaMensagens.take(); // bloqueia até ter uma mensagem
           String[] partes = mensagem.split("\\|");
@@ -48,6 +50,10 @@ public class AtualizarServidores {
       }
     });
     threadEnvio.start();
+  }
+
+  public String getIpServidor() {
+    return host;
   }
 
   /*
@@ -129,6 +135,11 @@ public class AtualizarServidores {
     String mensagem = "ATUALIZAR_LEAVE|" + nomeUsuario + "|" + nomeGrupo + "|" + enderecoUsuario + "|" + timeStamp;
     filaMensagens.add(mensagem);
 
+  }
+
+  public void encerrar() {
+    executando = false;
+    threadEnvio.interrupt(); // acorda a thread se estiver bloqueada no take()
   }
 
   // private void escolherNovoServidor(String tipoMensagem, String nomeUsuario,
