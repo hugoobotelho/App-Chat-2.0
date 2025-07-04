@@ -48,7 +48,7 @@ public class ClienteUDP {
       return new String(pacoteRecebido.getData(), 0, pacoteRecebido.getLength());
     } catch (Exception e) {
       e.printStackTrace();
-      return "Erro";
+      return "Erro ";
     }
   }
 

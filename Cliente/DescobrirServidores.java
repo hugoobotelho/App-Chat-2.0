@@ -1,5 +1,8 @@
 import java.net.*;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class DescobrirServidores {
   private final static int porta = 2025;
@@ -73,6 +76,7 @@ public class DescobrirServidores {
           // boolean servidorAtivoAindaVivo = false;
 
           long inicio = System.currentTimeMillis();
+          TreeSet<String> servidoresQueResponderam = new TreeSet<>();
           while (System.currentTimeMillis() - inicio < timeOutMs) {
             byte[] buffer = new byte[1024];
             DatagramPacket resposta = new DatagramPacket(buffer, buffer.length);
@@ -80,22 +84,33 @@ public class DescobrirServidores {
             try {
               socket.receive(resposta);
               InetAddress ipResposta = resposta.getAddress();
+              servidoresQueResponderam.add(ipResposta.getHostAddress());
               String msg = new String(resposta.getData(), 0, resposta.getLength());
 
               System.out.println("Resposta recebida de " + ipResposta.getHostAddress() + ": " + msg);
+
+
 
               if (msg.equals("IMALIVE")) {
                 // app.atualizaServidores(ipResposta, true);
                 app.setServidoresConhecidos(ipResposta.getHostAddress()); //adiciona o ip do novo servidor descoberto
 
-                // if (app.getServidorAtivo() == null) {
-                //   System.out.println("AVISO: `app.getServidorAtivo()` está NULL!");
-                // } else if (ipResposta.equals(app.getServidorAtivo())) {
-                //   servidorAtivoAindaVivo = true;
-                // }
               }
             } catch (SocketTimeoutException e) {
               // Nenhuma resposta no tempo esperado
+            }
+          }
+
+          Boolean servidorAindaAtivo = false;
+          for (String ip : servidoresQueResponderam) {
+            if (ip.equals(app.getIpServidor())){
+              servidorAindaAtivo = true;
+            }
+          }
+
+          if (!servidorAindaAtivo) {
+            if (servidoresQueResponderam.size() > 0) {
+              app.setIpServidor(servidoresQueResponderam.first());
             }
           }
 
